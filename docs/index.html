@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <title>D3 Block-a-Day: Day 16, January 16, 2017</title>
+</head>
+<!-- Example based on Michele Weigle's D3 Scatterplot Example http://bl.ocks.org/weiglemc/6185069 -->
+
+<style>
+	body {
+	  font: 16pt Avenir;
+	}
+
+	.axis path,
+	.axis line {
+		 fill: none;
+		 stroke: #000;
+		 shape-rendering: crispEdges;
+	}
+
+	.dot {
+		stroke: black;
+    stroke-width: 2px;
+    fill: #00c6c0;
+	}
+
+	.tooltip {
+  	background-color: #fedea3;
+  	padding: 7px;
+  	text-shadow: #f5f5f5 0 1px 0;
+  	font: 15px Avenir;
+  	border: 2px solid;
+  	border-color: black;
+		border-radius: 5px;
+  	position: absolute;
+  	box-shadow: rgba(0, 0, 0, 0.3) 0 2px 10px;
+  }
+  
+  .xaxis {
+     font: 16px Avenir;
+   }
+  
+   .yaxis {
+     font: 16px Avenir;
+   }
+</style>
+<body>
+<script src="//d3js.org/d3.v4.min.js"></script>
+
+<script>
+var margin = {top: 20, right: 20, bottom: 50, left: 70},
+    width = 960 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
+
+/*
+ * value accessor - returns the value to encode for a given data object.
+ * scale - maps value to a visual display encoding, such as a pixel position.
+ * map function - maps from data value to display value
+ * axis - sets up axis
+ */
+
+// setup x
+var xValue = function(d) { return d.winsPrev; }, // data -> value
+    xScale = d3.scaleLinear().range([0, width]), // value -> display
+    xMap = function(d) { return xScale(xValue(d));}, // data -> display
+    xAxis = d3.axisBottom(xScale);
+
+// setup y
+var yValue = function(d) { return d.wins; }, // data -> value
+    yScale = d3.scaleLinear().range([height, 0]), // value -> display
+    yMap = function(d) { return yScale(yValue(d));}, // data -> display
+    yAxis = d3.axisLeft(yScale);
+
+// add the graph canvas to the body of the webpage
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// add the tooltip area to the webpage
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+// load data
+d3.json("baseball_team_wins_current.json", function(error, data) {
+			if (error) return console.warn(error);
+
+  // change string into number format
+  data.forEach(function(d) {
+    d['year'] = +d['year'];
+  });
+
+  // don't want dots overlapping axis, so add in buffer to data domain
+  xScale.domain([40, 120]);
+  yScale.domain([40, 120]);
+
+  // x-axis
+  svg.append("g")
+      .attr("class", "xaxis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+  
+  svg.append("text")
+   		.attr("transform",
+            "translate(" + (width*0.1) + " ," +
+                           (height + margin.top + 30) + ")")
+      .style("text-anchor", "left")
+      .style("font-family", "Avenir")
+      .text("Wins 2015");
+
+  // y-axis
+  svg.append("g")
+      .attr("class", "yaxis")
+      .call(yAxis);
+  
+  svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 10 - margin.left)
+  		.attr("x", - 0.75*height)
+      .attr("dy", ".71em")
+      .style("text-anchor", "middle")
+      .style("font-family", "Avenir")
+      .text("Wins 2016");
+
+   var activeYear = 2016;
+   var years = data.filter(y => {
+       return y.year === activeYear || y.year === activeYear - 1;
+   });
+   var teams = years[0].teams;
+   var correlation = years[0].correlation;
+   teams.forEach((t, i) => {
+       var sameTeamPrevYear = years[1].teams.filter(t2 => {
+          return t2.name === t.name;
+        });
+        t.winsPrev = sameTeamPrevYear[0].wins;
+    });
+  
+  // draw dots
+  svg.selectAll(".dot")
+      .data(teams)
+	    .enter()
+      .append("circle")
+      .attr("class", "dot")
+      .attr("r", 10)
+      .attr("cx", xMap)
+      .attr("cy", yMap)
+      .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(150)
+          			.style("opacity", .9);
+          tooltip.html("<b>" + d.name + "</b>" + "<br/> 2015: " + xValue(d)
+	        + " Wins, 2016: " + yValue(d) + " Wins")
+               .style("left", (d3.event.pageX + 5) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(300)
+               .style("opacity", 0);
+      });
+
+  svg.append("text")
+   		.attr("transform",
+            "translate(50, 70)")
+      .style("text-anchor", "left")
+      .style("font-family", "Avenir")
+      .style("font-size", "35px")
+      .style("fill", "#ef9b00")
+      .style("stroke", "black")
+      .style("stroke-width", "0.5px")
+      .text("Correlation = " + correlation);
+
+
+});
+
+</script>
+</body>
