@@ -9,7 +9,7 @@ csv (first try to use JSON data instead of a flat format like csv).
 
 ## Results
 
-* [Source Code Gist](https://gist.github.com/dbetebenner/35c15572f0e296e67fae67626a9f0a9b)
-* [Bl.ocks.org View](http://bl.ocks.org/dbetebenner/35c15572f0e296e67fae67626a9f0a9b)
-* [Blockbuilder.org View](http://blockbuilder.org/dbetebenner/35c15572f0e296e67fae67626a9f0a9b)
-* [Github Pages View](https://dbetebenner.github.io/D3_01152017/)
+* [Source Code Gist](https://gist.github.com/dbetebenner/ad181211d2917d4748e4c2824fd7e982)
+* [Bl.ocks.org View](http://bl.ocks.org/dbetebenner/ad181211d2917d4748e4c2824fd7e982)
+* [Blockbuilder.org View](http://blockbuilder.org/dbetebenner/ad181211d2917d4748e4c2824fd7e982)
+* [Github Pages View](https://dbetebenner.github.io/D3_01162017/)
